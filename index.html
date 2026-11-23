@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>うちの献立 - 毎日の献立をかんたん記録</title>
+<meta name="description" content="よく作る料理を貯めて、毎日の献立を記録する Android アプリ。レシピサイトから共有で保存、カレンダーで週・月の献立を見渡せます。">
+<meta name="theme-color" content="#B8481C">
+<meta property="og:type" content="website">
+<meta property="og:title" content="うちの献立">
+<meta property="og:description" content="よく作る料理を貯めて、毎日の献立を記録する Android アプリ。">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/icon-192.png">
+<style>
+  :root {
+    color-scheme: light;
+    --brand: #B8481C;
+    --brand-dark: #9A3A14;
+    --brand-light: #FBE8DD;
+    --cream: #FBF6EF;
+    --ink: #3A2B20;
+    --muted: #74604F;
+    --line: #EADDCF;
+    --accent: #F2C25C;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    line-height: 1.8;
+  }
+  a { color: var(--brand); }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---- ヒーロー ---- */
+  .hero { background: var(--brand); color: #fff; overflow: hidden; }
+  .hero .wrap {
+    display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center;
+    padding-top: 56px; padding-bottom: 0;
+  }
+  .hero-text { padding-bottom: 56px; }
+  .app-id { display: flex; align-items: center; gap: 16px; }
+  .app-id img { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .hero h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.2; letter-spacing: .04em; }
+  .hero .bar { width: 56px; height: 4px; border-radius: 2px; background: var(--accent); margin: 24px 0 20px; }
+  .hero .catch { margin: 0; font-size: clamp(1.15rem, 2.6vw, 1.5rem); font-weight: 700; line-height: 1.6; }
+  .hero .lead { margin: 12px 0 28px; color: #FBE3D6; }
+  .btn-play {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #fff; color: var(--brand); text-decoration: none; font-weight: 700;
+    padding: 14px 28px; border-radius: 999px; box-shadow: 0 2px 10px rgba(0,0,0,.18);
+  }
+  .btn-play:hover { background: var(--brand-light); }
+  .btn-play:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .btn-play svg { width: 20px; height: 20px; fill: currentColor; }
+  .hero .note { margin: 12px 0 0; font-size: .85rem; color: #F6D3C1; }
+  .phone {
+    width: 280px; align-self: end;
+    border: 10px solid #2B1E16; border-bottom: 0; border-radius: 36px 36px 0 0;
+    background: #2B1E16; overflow: hidden; box-shadow: 0 -4px 24px rgba(0,0,0,.25);
+  }
+  .phone img { border-radius: 26px 26px 0 0; aspect-ratio: 540 / 960; object-fit: cover; object-position: top; height: 420px; width: 100%; }
+
+  /* ---- セクション共通 ---- */
+  section { padding: 64px 0; }
+  h2 { margin: 0 0 8px; font-size: 1.6rem; letter-spacing: .03em; }
+  .sub { margin: 0 0 32px; color: var(--muted); }
+
+  /* ---- スクリーンショット ---- */
+  .shots {
+    display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 4px 4px 16px; margin: 0 -4px; list-style: none;
+  }
+  .shots li { flex: 0 0 200px; scroll-snap-align: start; }
+  .shots img {
+    width: 200px; aspect-ratio: 540 / 960; border-radius: 16px;
+    border: 1px solid var(--line); background: #fff; box-shadow: 0 2px 8px rgba(58,43,32,.08);
+  }
+  .shots p { margin: 10px 0 0; text-align: center; font-size: .9rem; color: var(--muted); }
+
+  /* ---- 機能 ---- */
+  .features { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; list-style: none; padding: 0; margin: 0; }
+  .card { background: var(--cream); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card .ic {
+    width: 44px; height: 44px; border-radius: 12px; background: var(--brand-light);
+    display: grid; place-items: center; margin-bottom: 12px;
+  }
+  .card .ic svg { width: 24px; height: 24px; fill: var(--brand); }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .tour { margin: 32px 0 0; padding: 16px 20px; border-left: 4px solid var(--accent); background: var(--cream); border-radius: 0 12px 12px 0; }
+
+  /* ---- プライバシーポリシー ---- */
+  .policy h3 { margin: 28px 0 6px; font-size: 1.05rem; }
+  .policy p, .policy ul { margin: 0 0 8px; }
+  .policy ul { padding-left: 1.4em; }
+  .policy .date { margin-top: 28px; color: var(--muted); font-size: .9rem; }
+
+  /* ---- フッター ---- */
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: .9rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer nav { display: flex; gap: 20px; }
+
+  @media (max-width: 760px) {
+    .hero .wrap { grid-template-columns: 1fr; gap: 0; padding-top: 40px; }
+    .hero-text { padding-bottom: 40px; }
+    .phone { width: 240px; justify-self: center; }
+    .phone img { height: 300px; }
+    section { padding: 48px 0; }
+    .wrap { padding: 0 16px; }
+    .shots li { flex-basis: 160px; }
+    .shots img { width: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-text">
+      <div class="app-id">
+        <img src="images/icon-192.png" alt="" width="72" height="72">
+        <h1>うちの献立</h1>
+      </div>
+      <div class="bar"></div>
+      <p class="catch">毎日の献立を、かんたん記録。<br>カレンダーで振り返り。</p>
+      <p class="lead">よく作る料理を貯めて、毎日の献立を記録するアプリです。</p>
+      <a class="btn-play" href="https://play.google.com/store/apps/details?id=app.yamato.myrecipe">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        Google Play で入手
+      </a>
+      <p class="note">Android 用アプリ</p>
+    </div>
+    <div class="phone">
+      <img src="images/1-calendar-week.png" alt="週のカレンダー画面。日付ごとに朝・昼・夜の料理が並んでいる" width="540" height="960">
+    </div>
+  </div>
+</header>
+
+<main>
+  <section aria-labelledby="shots-title">
+    <div class="wrap">
+      <h2 id="shots-title">画面</h2>
+      <p class="sub">横にスクロールすると、ほかの画面も見られます。</p>
+      <ul class="shots">
+        <li><img src="images/1-calendar-week.png" alt="週のカレンダー" width="540" height="960" loading="lazy"><p>週のカレンダー</p></li>
+        <li><img src="images/2-menu.png" alt="献立" width="540" height="960" loading="lazy"><p>献立</p></li>
+        <li><img src="images/3-recipes.png" alt="レシピ一覧" width="540" height="960" loading="lazy"><p>レシピ一覧</p></li>
+        <li><img src="images/4-recipe-detail.png" alt="料理の詳細" width="540" height="960" loading="lazy"><p>料理の詳細</p></li>
+        <li><img src="images/5-calendar-month.png" alt="月のカレンダー" width="540" height="960" loading="lazy"><p>月のカレンダー</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="features" aria-labelledby="features-title">
+    <div class="wrap">
+      <h2 id="features-title">できること</h2>
+      <p class="sub">料理を貯めて、献立を記録して、あとから見返す。必要なことだけをまとめました。</p>
+      <ul class="grid">
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></div>
+          <h3>「共有」で料理を保存</h3>
+          <p>レシピサイトやアプリの「共有」から、料理をそのまま保存できます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
+          <h3>料理ごとに記録</h3>
+          <p>材料、メモ、レシピURL、作った日の記録を料理ごとに管理できます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg></div>
+          <h3>朝・昼・夜で献立を記録</h3>
+          <p>献立は日付と朝・昼・夜で記録します。区切りの数や名前(弁当、おやつなど)も変えられます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg></div>
+          <h3>カレンダーで見渡す</h3>
+          <p>週・月の献立をカレンダーで一覧できます。長押しで別の日へ移動・コピーもできます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg></div>
+          <h3>絞り込みと並べ替え</h3>
+          <p>「まだ作ってない」料理や分類で絞り込んだり、よく作る順に並べ替えたりできます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></div>
+          <h3>「元に戻す」で取り消し</h3>
+          <p>間違えて動かしたり外したりしても、「元に戻す」で取り消せます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div>
+          <h3>バックアップ</h3>
+          <p>データの書き出し・読み込みができるので、機種変更のときも引き継げます。</p>
+        </li>
+      </ul>
+      <p class="tour">初めて開いたときは、各画面の使い方をサンプルのデータで案内します。</p>
+    </div>
+  </section>
+
+  <section id="privacy" class="policy" aria-labelledby="privacy-title">
+    <div class="wrap">
+      <h2 id="privacy-title">プライバシーポリシー</h2>
+      <p>「うちの献立」(以下「本アプリ」)における利用者の情報の扱いについて説明します。</p>
+
+      <h3>保存するデータ</h3>
+      <p>本アプリに登録した料理・献立・メモなどのデータは、お使いの端末の中にだけ保存されます。開発者のサーバーに送信したり、開発者が収集したりすることはありません。アカウントの登録も不要です。</p>
+
+      <h3>レシピのページの読み込み</h3>
+      <p>ほかのアプリから URL を共有して料理を保存するとき、料理名を自動で入れるために、端末からそのページを直接読み込みます。読み込んだ内容は料理名の取得にだけ使います。</p>
+
+      <h3>広告</h3>
+      <p>本アプリは広告の表示に Google AdMob を使用しています。広告の配信のため、広告 ID などの端末の情報が Google に送信されることがあります。Google による情報の扱いについては、次のページをご覧ください。</p>
+      <ul>
+        <li><a href="https://policies.google.com/technologies/ads?hl=ja">Google の広告に関するポリシー</a></li>
+        <li><a href="https://policies.google.com/privacy?hl=ja">Google プライバシー ポリシー</a></li>
+      </ul>
+
+      <h3>バックアップ</h3>
+      <p>バックアップを書き出すと、利用者が選んだ保存先(Google ドライブなど)にデータのファイルが保存されます。本アプリをアンインストールすると端末内のデータは消えるため、機種変更やアンインストールの前にバックアップを書き出してください。</p>
+
+      <h3>お問い合わせ</h3>
+      <p>お問い合わせは、<a href="https://play.google.com/store/apps/details?id=app.yamato.myrecipe">Google Play の本アプリのページ</a>に記載の連絡先までお願いします。</p>
+
+      <h3>改定</h3>
+      <p>このポリシーは、必要に応じて改定することがあります。改定したときは、このページでお知らせします。</p>
+
+      <p class="date">制定日: 2026年11月23日</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 うちの献立</span>
+    <nav>
+      <a href="https://play.google.com/store/apps/details?id=app.yamato.myrecipe">Google Play</a>
+      <a href="https://s-yamato.notion.site/4069c6cfc3d2807ab995c69af77dc1b3">プライバシーポリシー</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
