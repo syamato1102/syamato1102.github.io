@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ちょうどいい算数 - 計算ドリル</title>
+<meta name="description" content="足し算・引き算・かけ算・割り算の問題がランダムに出る計算ドリルの Android アプリ。数の範囲や問題数を決めて、ちょうどいい難しさで練習できます。">
+<meta name="theme-color" content="#E64A19">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ちょうどいい算数">
+<meta property="og:description" content="ちょうどいい難しさで計算を練習できる、計算ドリルの Android アプリ。">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/icon-192.png">
+<style>
+  :root {
+    color-scheme: light;
+    --brand: #E64A19;
+    --brand-dark: #C62828;
+    --brand-light: #FFE7DC;
+    --cream: #FFF7F1;
+    --ink: #33261F;
+    --muted: #725F55;
+    --line: #F1DDD1;
+    --accent: #FFC107;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    line-height: 1.8;
+  }
+  a { color: var(--brand-dark); }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---- ヒーロー ---- */
+  .hero { background: linear-gradient(135deg, var(--brand), var(--brand-dark)); color: #fff; }
+  .hero .wrap {
+    display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center;
+    padding-top: 56px; padding-bottom: 56px;
+  }
+  .app-id { display: flex; align-items: center; gap: 16px; }
+  .app-id img { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .hero h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.2; letter-spacing: .04em; }
+  .hero .bar { width: 56px; height: 4px; border-radius: 2px; background: var(--accent); margin: 24px 0 20px; }
+  .hero .catch { margin: 0; font-size: clamp(1.15rem, 2.6vw, 1.5rem); font-weight: 700; line-height: 1.6; }
+  .hero .lead { margin: 12px 0 28px; color: #FFE9E0; }
+  .btn-play {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #fff; color: var(--brand-dark); text-decoration: none; font-weight: 700;
+    padding: 14px 28px; border-radius: 999px; box-shadow: 0 2px 10px rgba(0,0,0,.18);
+  }
+  .btn-play:hover { background: var(--brand-light); }
+  .btn-play:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .btn-play svg { width: 20px; height: 20px; fill: currentColor; }
+  .hero .note { margin: 12px 0 0; font-size: .85rem; color: #FFD9CC; }
+  .hero-shot { width: 260px; border-radius: 20px; box-shadow: 0 8px 28px rgba(0,0,0,.28); }
+
+  /* ---- セクション共通 ---- */
+  section { padding: 64px 0; }
+  h2 { margin: 0 0 8px; font-size: 1.6rem; letter-spacing: .03em; }
+  .sub { margin: 0 0 32px; color: var(--muted); }
+
+  /* ---- スクリーンショット ---- */
+  .shots {
+    display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 4px 4px 16px; margin: 0 -4px; list-style: none;
+  }
+  .shots li { flex: 0 0 220px; scroll-snap-align: start; }
+  .shots img {
+    width: 220px; aspect-ratio: 540 / 960; border-radius: 16px;
+    border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(51,38,31,.08);
+  }
+
+  /* ---- モード・機能 ---- */
+  .band { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; list-style: none; padding: 0; margin: 0; }
+  .modes { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .card { background: var(--cream); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card .ic {
+    width: 44px; height: 44px; border-radius: 12px; background: var(--brand-light);
+    display: grid; place-items: center; margin-bottom: 12px;
+  }
+  .card .ic svg { width: 24px; height: 24px; fill: var(--brand); }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .mode { border-top: 5px solid var(--c); }
+  .mode h3 { color: var(--c); }
+
+  /* ---- プライバシーポリシー ---- */
+  .policy h3 { margin: 28px 0 6px; font-size: 1.05rem; }
+  .policy p, .policy ul { margin: 0 0 8px; }
+  .policy ul { padding-left: 1.4em; }
+  .policy .date { margin-top: 28px; color: var(--muted); font-size: .9rem; }
+
+  /* ---- フッター ---- */
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: .9rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer nav { display: flex; gap: 20px; }
+
+  @media (max-width: 760px) {
+    .hero .wrap { grid-template-columns: 1fr; padding-top: 40px; padding-bottom: 40px; }
+    .hero-shot { display: none; }
+    section { padding: 48px 0; }
+    .wrap { padding: 0 16px; }
+    .shots li { flex-basis: 180px; }
+    .shots img { width: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="app-id">
+        <img src="images/icon-192.png" alt="" width="72" height="72">
+        <h1>ちょうどいい算数</h1>
+      </div>
+      <div class="bar"></div>
+      <p class="catch">ちょうどいい難しさで、<br>計算をくり返し練習。</p>
+      <p class="lead">足し算・引き算・かけ算・割り算の問題がランダムに出る計算ドリルです。数の範囲や問題数を決めて、自分に合った難しさで練習できます。</p>
+      <a class="btn-play" href="https://play.google.com/store/apps/details?id=app.yamato.justmath">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        Google Play で入手
+      </a>
+      <p class="note">Android 用アプリ</p>
+    </div>
+    <img class="hero-shot" src="images/screenshot-1.png" alt="計算画面。問題「6 + 2 = ?」と大きなテンキー" width="540" height="960">
+  </div>
+</header>
+
+<main>
+  <section aria-labelledby="shots-title">
+    <div class="wrap">
+      <h2 id="shots-title">画面</h2>
+      <p class="sub">横にスクロールすると、ほかの画面も見られます。</p>
+      <ul class="shots">
+        <li><img src="images/screenshot-1.png" alt="サクサク解ける計算ドリル。大きなテンキーでかんたん回答" width="540" height="960" loading="lazy"></li>
+        <li><img src="images/screenshot-2.png" alt="4つのモードで楽しく特訓。カウントダウン・タイムアタックほか" width="540" height="960" loading="lazy"></li>
+        <li><img src="images/screenshot-3.png" alt="ちょうどいい難易度に自由に設定。演算の種類も数の範囲も選べる" width="540" height="960" loading="lazy"></li>
+        <li><img src="images/screenshot-4.png" alt="成績を記録して成長を実感。正答率と所要時間をひと目で確認" width="540" height="960" loading="lazy"></li>
+        <li><img src="images/screenshot-5.png" alt="シンプルで使いやすい。毎日の計算トレーニングに" width="540" height="960" loading="lazy"></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="modes-title">
+    <div class="wrap">
+      <h2 id="modes-title">4つのモード</h2>
+      <p class="sub">目的に合わせて、練習のしかたを選べます。</p>
+      <ul class="grid modes">
+        <li class="card mode" style="--c: #E64A19">
+          <h3>カウントダウン</h3>
+          <p>制限時間内に何問解けるかに挑戦します。</p>
+        </li>
+        <li class="card mode" style="--c: #1E88E5">
+          <h3>タイムアタック</h3>
+          <p>決めた問題数を、何秒で全部正解できるかを計ります。</p>
+        </li>
+        <li class="card mode" style="--c: #8E24AA">
+          <h3>チャレンジ</h3>
+          <p>制限時間内に決めた問題数を正解できないと、はじめからやり直しです。</p>
+        </li>
+        <li class="card mode" style="--c: #2E7D32">
+          <h3>トレーニング</h3>
+          <p>決めた時間のあいだ、ひたすら問題を解き続けます。</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="features-title">
+    <div class="wrap">
+      <h2 id="features-title">できること</h2>
+      <p class="sub">お子さまの計算練習にも、大人の頭の体操にも使えます。</p>
+      <ul class="grid">
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+          <h3>演算の種類を選べる</h3>
+          <p>足し算・引き算・かけ算・割り算から、練習したいものを選んで組み合わせられます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg></div>
+          <h3>数の範囲を細かく設定</h3>
+          <p>左の数・右の数の範囲を別々に決められます。答えの範囲をしぼることもできます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg></div>
+          <h3>問題数と時間</h3>
+          <p>問題数や制限時間、トレーニングの時間を決めて練習できます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z"/></svg></div>
+          <h3>大きなテンキー</h3>
+          <p>大きなボタンで答えを入力できるので、小さなお子さまでも操作しやすくなっています。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></div>
+          <h3>正解・不正解を音でお知らせ</h3>
+          <p>正解すると音が鳴って、すぐ次の問題に進みます。音はオフにもできます。</p>
+        </li>
+        <li class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg></div>
+          <h3>成績を記録</h3>
+          <p>正答率や所要時間が記録されるので、上達のようすを見返せます。</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="privacy" class="policy band" aria-labelledby="privacy-title">
+    <div class="wrap">
+      <h2 id="privacy-title">プライバシーポリシー</h2>
+      <p>「ちょうどいい算数」(以下「本アプリ」)における利用者の情報の扱いについて説明します。</p>
+
+      <h3>保存するデータ</h3>
+      <p>本アプリの設定と成績は、お使いの端末の中にだけ保存されます。開発者のサーバーに送信したり、開発者が収集したりすることはありません。アカウントの登録も不要です。名前やメールアドレスなどの個人情報を入力する機能はありません。</p>
+
+      <h3>広告</h3>
+      <p>本アプリは広告の表示に Google AdMob を使用しています。表示する広告は、画面下部のバナー広告と、設定を保存するときに表示する動画広告(リワード広告)です。</p>
+      <p>広告は子ども向けの扱いでリクエストし、全年齢向けの内容に限定しています。利用者の興味・関心に基づく広告(パーソナライズド広告)は表示しません。広告の配信のため、端末の情報が Google に送信されることがあります。Google による情報の扱いについては、次のページをご覧ください。</p>
+      <ul>
+        <li><a href="https://policies.google.com/technologies/ads?hl=ja">Google の広告に関するポリシー</a></li>
+        <li><a href="https://policies.google.com/privacy?hl=ja">Google プライバシー ポリシー</a></li>
+      </ul>
+
+      <h3>データの削除</h3>
+      <p>成績はアプリの成績画面から削除できます。本アプリをアンインストールすると、端末内の設定と成績はすべて削除されます。</p>
+
+      <h3>お問い合わせ</h3>
+      <p>お問い合わせは、<a href="https://play.google.com/store/apps/details?id=app.yamato.justmath">Google Play の本アプリのページ</a>に記載の連絡先までお願いします。</p>
+
+      <h3>改定</h3>
+      <p>このポリシーは、必要に応じて改定することがあります。改定したときは、このページでお知らせします。</p>
+
+      <p class="date">制定日: 2026年11月28日</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 ちょうどいい算数</span>
+    <nav>
+      <a href="../">アプリ一覧</a>
+      <a href="https://play.google.com/store/apps/details?id=app.yamato.justmath">Google Play</a>
+      <a href="#privacy">プライバシーポリシー</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
